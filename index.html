@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Expense Tracker — Themed UI</title>
+  <style>
+    /* ---------- THEME VARIABLES (Default: Light Pastel) ---------- */
+    :root{
+      --bg-color: linear-gradient(180deg,#f6f8ff,#ffffff);
+      --page-bg: #f6f8ff;
+      --card-bg: rgba(255,255,255,0.95);
+      --muted: #7b7f9e;
+      --text: #222334;
+      --accent-1: #a8d5e2; /* teal */
+      --accent-2: #ffd6e0; /* pink */
+      --accent-3: #fbe8b6; /* yellow */
+      --glass: rgba(255,255,255,0.6);
+      --shadow: 0 12px 30px rgba(34,40,72,0.08);
+      --radius: 14px;
+      --btn-gradient: linear-gradient(90deg,var(--accent-2),var(--accent-1));
+      --input-border: #eef0f8;
+      --anime-bg: url('assets/anime-bg.jpg'); /* put your anime image at assets/anime-bg.jpg or replace URL here */
+      --transition: 300ms cubic-bezier(.2,.9,.25,1);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    /* Dark Theme */
+    .theme-dark{
+      --page-bg: #0f1221;
+      --card-bg: rgba(12,14,25,0.72);
+      --muted: #9aa0bf;
+      --text: #e8ecff;
+      --accent-1: #6ec1ff;
+      --accent-2: #a66dff;
+      --accent-3: #ffd36b;
+      --btn-gradient: linear-gradient(90deg,#6ec1ff,#a66dff);
+      --input-border: rgba(255,255,255,0.08);
+    }
+
+    /* Neon Theme */
+    .theme-neon{
+      --page-bg: #04060b;
+      --card-bg: rgba(2,6,18,0.6);
+      --muted: #a8b0d6;
+      --text: #e6f7ff;
+      --accent-1: #00ffbf;
+      --accent-2: #00a6ff;
+      --accent-3: #ff00d6;
+      --btn-gradient: linear-gradient(90deg,#00ffbf,#00a6ff,#ff00d6);
+      --input-border: rgba(255,255,255,0.06);
+    }
+
+    /* Regular (no-fuss) theme */
+    .theme-regular{
+      --page-bg: #ffffff;
+      --card-bg: #ffffff;
+      --muted: #6b7280;
+      --text: #111827;
+      --accent-1: #3b82f6;
+      --accent-2: #06b6d4;
+      --accent-3: #f59e0b;
+      --btn-gradient: linear-gradient(90deg,#3b82f6,#06b6d4);
+      --input-border: #e6eefb;
+    }
+
+    /* ---------- Page layout ---------- */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--page-bg);transition:background var(--transition)}
+    body{
+      background-image: var(--anime-bg);
+      background-size:cover;background-position:center;background-repeat:no-repeat; /* anime image underlay */
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      padding:28px;
+    }
+    .overlay{
+      position:fixed;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.30), rgba(255,255,255,0.02));pointer-events:none;mix-blend-mode:normal;opacity:0.95;
+    }
+
+    .app{
+      max-width:1200px;margin:40px auto;display:grid;grid-template-columns:380px 1fr;gap:28px;align-items:start;position:relative;z-index:2;
+    }
+
+    /* Card */
+    .card{
+      background:var(--card-bg);backdrop-filter:blur(8px);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);
+      transition:box-shadow var(--transition),transform var(--transition),background var(--transition);
+      border:1px solid rgba(255,255,255,0.04);
+    }
+
+    /* Header / Brand */
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+    .logo{width:54px;height:54px;border-radius:12px;display:grid;place-items:center;font-weight:800;color:var(--text);background:linear-gradient(135deg,var(--accent-1),var(--accent-2));box-shadow:0 10px 30px rgba(0,0,0,0.18);font-size:18px}
+    h1{font-size:20px;margin:0;color:var(--text)}
+    p.lead{margin:6px 0 18px;color:var(--muted);font-size:13px}
+
+    label{display:block;font-size:13px;color:var(--muted);margin-top:12px}
+    input[type=text], input[type=number], input[type=date], select, textarea{
+      width:100%;padding:12px 14px;margin-top:8px;border-radius:12px;border:1px solid var(--input-border);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));font-size:14px;color:var(--text);outline:none;transition:box-shadow var(--transition),transform .12s,background var(--transition),border-color var(--transition)
+    }
+    input:focus, select:focus, textarea:focus{box-shadow:0 10px 30px rgba(34,47,80,0.12);transform:translateY(-3px);border-color:rgba(0,0,0,0.06)}
+
+    .row{display:flex;gap:10px}
+
+    /* ---------- Buttons ---------- */
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:0;background:var(--btn-gradient);color:var(--text);font-weight:700;cursor:pointer;box-shadow:0 14px 40px rgba(12,18,30,0.12);transition:transform var(--transition),box-shadow var(--transition),opacity var(--transition)
+    }
+
+    /* ghost regular - soft outline */
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text);font-weight:700}
+
+    /* fully-gradient button for inputs/actions */
+    .btn.gradient{background:linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));padding:12px 16px;border-radius:14px}
+
+    .btn:hover{transform:translateY(-4px);opacity:0.98}
+    .btn:active{transform:translateY(-1px);}
+
+    /* small pill */
+    .pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.04)}
+
+    /* Right - Overview */
+    .overview{display:grid;grid-template-rows:auto auto 1fr;gap:18px}
+    .summary{display:flex;gap:18px}
+    .stat{flex:1;padding:16px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.03)}
+    .stat h3{margin:0;font-size:13px;color:var(--muted)}
+    .stat p{margin:6px 0 0;font-size:20px;font-weight:800;color:var(--text)}
+
+    /* list */
+    .list{margin-top:6px;border-radius:12px;padding:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:var(--shadow);}
+    .expense-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;margin:8px 0;transition:transform var(--transition),background var(--transition)}
+    .expense-item:hover{transform:translateY(-6px)}
+    .left{display:flex;gap:12px;align-items:center}
+    .tag{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-weight:700;color:var(--text)}
+    .meta{font-size:14px;color:var(--text)}
+    .meta small{display:block;color:var(--muted);font-size:12px}
+    .actions{display:flex;gap:8px}
+    .icon-btn{border:0;padding:8px;border-radius:8px;background:transparent;cursor:pointer;font-size:16px}
+
+    /* chart */
+    .chart-wrap{padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:var(--shadow);}
+    canvas{width:100%;height:160px}
+
+    /* responsive */
+    @media (max-width:980px){
+      .app{grid-template-columns:1fr; padding:18px}
+      .logo{width:42px;height:42px}
+    }
+
+    /* subtle animated glow for neon theme */
+    .theme-neon .logo{box-shadow:0 8px 30px rgba(0,255,191,0.12), 0 0 40px rgba(0,166,255,0.08) inset;animation:neonGlow 3s ease-in-out infinite}
+    @keyframes neonGlow{0%{filter:drop-shadow(0 0 0 rgba(0,0,0,0))}50%{filter:drop-shadow(0 0 18px rgba(0,255,191,0.18))}100%{filter:drop-shadow(0 0 0 rgba(0,0,0,0))}}
+
+    /* utility */
+    .muted{color:var(--muted)}
+    .flex{display:flex;align-items:center;gap:10px}
+    .center{justify-content:center}
+
+  </style>
+</head>
+<body>
+  <!-- Overlay gives depth between anime BG and UI -->
+  <div class="overlay"></div>
+
+  <div style="display:flex;gap:12px;max-width:1200px;margin:12px auto 0;justify-content:flex-end;padding:0 28px;z-index:3;position:relative">
+    <button id="themeBtn" class="btn ghost">Change Theme</button>
+    <button id="toggleAnim" class="btn ghost">Toggle Smooth Anim</button>
+  </div>
+
+  <div class="app">
+    <div class="card">
+      <div class="brand">
+        <div class="logo">ET</div>
+        <div>
+          <h1>Expense Tracker</h1>
+          <p class="lead">Beautiful themed UI — click <strong>Change Theme</strong> to cycle Dark / Neon / Regular.</p>
+        </div>
+      </div>
+
+      <label for="title">Title</label>
+      <input id="title" placeholder="e.g. Grocery, Amazon" type="text" />
+
+      <div class="row">
+        <div style="flex:2">
+          <label for="amount">Amount (₹)</label>
+          <input id="amount" type="number" step="0.01" placeholder="0.00" />
+        </div>
+        <div style="flex:1">
+          <label for="date">Date</label>
+          <input id="date" type="date" />
+        </div>
+      </div>
+
+      <label for="category">Category</label>
+      <select id="category">
+        <option value="Food">Food</option>
+        <option value="Transport">Transport</option>
+        <option value="Shopping">Shopping</option>
+        <option value="Bills">Bills</option>
+        <option value="Health">Health</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="notes">Notes (optional)</label>
+      <textarea id="notes" rows="3" placeholder="Small note about expense..."></textarea>
+
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn" id="saveBtn">Add Expense</button>
+        <button class="btn ghost" id="clearBtn">Clear</button>
+      </div>
+
+      <div style="margin-top:16px;font-size:13px;color:var(--muted)">Tip: Expenses are saved locally on this browser using <strong>localStorage</strong>.</div>
+    </div>
+
+    <div class="overview">
+
+      <div class="summary">
+        <div class="stat">
+          <h3>Total Balance</h3>
+          <p id="total">₹ 0.00</p>
+        </div>
+        <div class="stat">
+          <h3>Monthly Spend</h3>
+          <p id="monthly">₹ 0.00</p>
+        </div>
+        <div class="stat">
+          <h3>Transactions</h3>
+          <p id="count">0</p>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="muted">Spending last 6 months</div>
+          <div class="flex">
+            <select id="monthFilter" class="pill">
+              <option value="all">All</option>
+            </select>
+            <button class="btn ghost" id="exportBtn">Export CSV</button>
+          </div>
+        </div>
+        <canvas id="chart"></canvas>
+      </div>
+
+      <div class="list" id="list"></div>
+
+    </div>
+  </div>
+
+  <script>
+    // Theme & Animation toggles + keep original app logic
+    (function(){
+      const themes = ['','theme-dark','theme-neon','theme-regular']; // '' = default (root)
+      let idx = 0;
+      const themeBtn = document.getElementById('themeBtn');
+      const toggleAnim = document.getElementById('toggleAnim');
+      let animOn = true;
+
+      themeBtn.addEventListener('click', ()=>{
+        idx = (idx + 1) % themes.length;
+        // clear existing theme classes
+        document.documentElement.classList.remove('theme-dark','theme-neon','theme-regular');
+        if(themes[idx]) document.documentElement.classList.add(themes[idx]);
+        themeBtn.textContent = 'Theme: ' + (themes[idx] || 'Pastel');
+      });
+
+      toggleAnim.addEventListener('click', ()=>{
+        animOn = !animOn;
+        document.documentElement.style.setProperty('--transition', animOn? '300ms cubic-bezier(.2,.9,.25,1)' : '0ms');
+        toggleAnim.textContent = animOn? 'Smooth Anim: ON' : 'Smooth Anim: OFF';
+      });
+
+      // prefill text for UX
+      themeBtn.textContent = 'Theme: Pastel';
+      toggleAnim.textContent = 'Smooth Anim: ON';
+
+    })();
+
+    // --------- Rest of app logic (same as before) ---------
+    const $ = id => document.getElementById(id);
+    let expenses = JSON.parse(localStorage.getItem('expenses_v1') || '[]');
+    let editingId = null;
+
+    // init
+    function init(){
+      const today = new Date().toISOString().slice(0,10);
+      $('date').value = today;
+      renderList(); populateFilter(); updateSummary(); drawChart();
+    }
+
+    $('saveBtn').addEventListener('click', ()=>{
+      const title = $('title').value.trim();
+      const amount = parseFloat($('amount').value);
+      const date = $('date').value;
+      const category = $('category').value;
+      const notes = $('notes').value.trim();
+
+      if(!title || !date || isNaN(amount)){
+        alert('Please enter valid title, date and amount.');
+        return;
+      }
+
+      if(editingId){
+        const idx = expenses.findIndex(e=>e.id===editingId);
+        if(idx>-1){ expenses[idx] = {...expenses[idx], title, amount, date, category, notes}; editingId = null; $('saveBtn').textContent = 'Add Expense'; }
+      } else { expenses.push({id:Date.now().toString(36), title, amount, date, category, notes}); }
+
+      persist(); clearForm(); renderList(); updateSummary(); populateFilter(); drawChart();
+    });
+
+    $('clearBtn').addEventListener('click', ()=>{ clearForm(); });
+    function clearForm(){ $('title').value=''; $('amount').value=''; $('notes').value=''; $('date').value=new Date().toISOString().slice(0,10); $('category').value='Food'; editingId = null; $('saveBtn').textContent = 'Add Expense'; }
+    function persist(){ localStorage.setItem('expenses_v1', JSON.stringify(expenses)); }
+
+    function renderList(){ const el = $('list'); el.innerHTML=''; if(expenses.length===0){ el.innerHTML='<div style="padding:18px;color:var(--muted)">No expenses yet — add one from the left.</div>'; return; }
+      const sorted = [...expenses].sort((a,b)=>new Date(b.date)-new Date(a.date));
+      sorted.forEach(item=>{ const node = document.createElement('div'); node.className='expense-item'; const color = colorForCategory(item.category);
+        node.innerHTML = `
+          <div class="left">
+            <div class="tag" style="background:${color};color:var(--text)">${item.category[0] || 'X'}</div>
+            <div>
+              <div class="meta">${escapeHtml(item.title)} <small>${formatDate(item.date)} • ${escapeHtml(item.category)}</small></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="text-align:right;margin-right:6px">₹ ${formatNumber(item.amount)}</div>
+            <div class="actions">
+              <button class="icon-btn" onclick="editItem('${item.id}')" title="Edit">✏️</button>
+              <button class="icon-btn" onclick="deleteItem('${item.id}')" title="Delete">🗑️</button>
+            </div>
+          </div>
+        `; el.appendChild(node); }); }
+
+    function editItem(id){ const item = expenses.find(e=>e.id===id); if(!item) return; $('title').value=item.title; $('amount').value=item.amount; $('date').value=item.date; $('category').value=item.category; $('notes').value=item.notes; editingId = id; $('saveBtn').textContent = 'Update'; window.scrollTo({top:0,behavior:'smooth'}); }
+    function deleteItem(id){ if(!confirm('Delete this expense?')) return; expenses = expenses.filter(e=>e.id!==id); persist(); renderList(); updateSummary(); populateFilter(); drawChart(); }
+
+    function updateSummary(){ const total = expenses.reduce((s,e)=>s+Number(e.amount||0),0); $('total').textContent = '₹ ' + formatNumber(total); $('count').textContent = expenses.length; const now = new Date(); const monthSum = expenses.filter(e=>{ const d = new Date(e.date); return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth(); }).reduce((s,e)=>s+Number(e.amount||0),0); $('monthly').textContent = '₹ ' + formatNumber(monthSum); }
+
+    function populateFilter(){ const sel = $('monthFilter'); const months = new Map(); expenses.forEach(e=>{ const d=new Date(e.date); const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); const label = d.toLocaleString(undefined,{month:'short',year:'numeric'}); months.set(key,label); }); sel.innerHTML = '<option value="all">All</option>' + [...months.entries()].map(([k,v])=>`<option value="${k}">${v}</option>`).join(''); }
+
+    document.getElementById('monthFilter').addEventListener('change', ()=>{ drawChart(); });
+    document.getElementById('exportBtn').addEventListener('click', ()=>{ if(expenses.length===0){ alert('No expenses to export'); return; } const rows = [['Title','Amount','Date','Category','Notes']].concat(expenses.map(e=>[e.title,e.amount,e.date,e.category,e.notes])); const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/\"/g,'""')}"`).join(',')).join(''); const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='expenses.csv'; a.click(); URL.revokeObjectURL(url); });
+
+    // Chart
+    function drawChart(){ const canvas = $('chart'); const ctx = canvas.getContext('2d'); canvas.width = canvas.clientWidth * devicePixelRatio; canvas.height = 160 * devicePixelRatio; ctx.scale(devicePixelRatio, devicePixelRatio); ctx.clearRect(0,0,canvas.width,canvas.height);
+      const counts = {}; const now = new Date(); const months = []; for(let i=5;i>=0;i--){ const d = new Date(now.getFullYear(), now.getMonth()-i, 1); const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); months.push({key,label:d.toLocaleString(undefined,{month:'short'})}); counts[key]=0; }
+      const filter = $('monthFilter').value; expenses.forEach(e=>{ const d=new Date(e.date); const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); if(counts[key]!==undefined) counts[key]+=Number(e.amount||0); }); const values = months.map(m=>counts[m.key]||0); const max = Math.max(...values,10); const w = canvas.clientWidth; const h = 140; const padding=28; const barW = (w - padding*2) / values.length * 0.7; values.forEach((val,i)=>{ const x = padding + i * ((w - padding*2) / values.length) + (( (w - padding*2) / values.length) - barW)/2; const height = (val / max) * (h - 40); const y = h - height + 10; const g = ctx.createLinearGradient(x, y, x, y+height); g.addColorStop(0, 'rgba(255,214,230,0.95)'); g.addColorStop(1, 'rgba(168,213,226,0.95)'); ctx.fillStyle = g; roundRect(ctx, x, y, barW, height, 8, true, false); ctx.fillStyle = '#6e7288'; ctx.font = '12px system-ui'; ctx.fillText(months[i].label, x, h + 26); ctx.fillStyle = '#2b2f4a'; ctx.font='12px system-ui'; ctx.fillText('₹' + formatNumber(values[i]), x, y - 6); }); }
+
+    function formatNumber(n){ return Number(n).toLocaleString(undefined,{maximumFractionDigits:2,minimumFractionDigits:2}); }
+    function formatDate(s){ const d=new Date(s); return d.toLocaleDateString(); }
+    function colorForCategory(c){ const map = {Food:'linear-gradient(135deg,var(--accent-2),var(--accent-1))', Transport:'linear-gradient(135deg,var(--accent-3),var(--accent-1))', Shopping:'linear-gradient(135deg,#ffe1f0,#cfeef7)', Bills:'linear-gradient(135deg,#fff2d6,#d5f3e3)', Health:'linear-gradient(135deg,#ffe6f0,#fff7d9)'}; return map[c] || 'linear-gradient(135deg,var(--accent-1),var(--accent-2))'; }
+    function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) { if (typeof stroke == 'undefined') stroke = true; if (typeof radius === 'undefined') radius = 5; if (typeof radius === 'number') radius = {tl: radius, tr: radius, br: radius, bl: radius}; ctx.beginPath(); ctx.moveTo(x + radius.tl, y); ctx.lineTo(x + width - radius.tr, y); ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr); ctx.lineTo(x + width, y + height - radius.br); ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height); ctx.lineTo(x + radius.bl, y + height); ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl); ctx.lineTo(x, y + radius.tl); ctx.quadraticCurveTo(x, y, x + radius.tl, y); ctx.closePath(); if (fill) ctx.fill(); if (stroke) ctx.stroke(); }
+
+    init(); window.addEventListener('resize', ()=>{ drawChart(); });
+  </script>
+</body>
+</html>
